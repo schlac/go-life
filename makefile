@@ -1,6 +1,6 @@
 TARGET = life
 VERSION = $(shell git describe --tags --always)
-GO_BUILD_ARGS = -ldflags "-X main.Version=$(VERSION)"
+GO_BUILD_ARGS = -ldflags "-X main.version=$(VERSION)"
 
 all: clean build test
 env:

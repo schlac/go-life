@@ -4,9 +4,10 @@ import (
 	"github.com/schlac/go-life/ui"
 )
 
-var Version string = "private"
+var (
+	version string = "private"
+)
 
 func main() {
-	ui.PrintHello(Version)
+	ui.PrintHello(version)
 }
-
