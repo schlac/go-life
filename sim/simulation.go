@@ -17,12 +17,12 @@ func NewSimulation(sp *Space) *Simulation {
 }
 
 func (s *Simulation) print() {
-	log.Printf("%i:\n", s.round)
+	log.Printf("%d:\n", s.round)
 	log.Println(s.space.ToString())
 }
 
 func (s *Simulation) Play() {
-	log.Printf("Starting round %i", s.round)
+	log.Printf("Starting round %d", s.round)
 	s.print()
 }
 
