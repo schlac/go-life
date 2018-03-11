@@ -17,8 +17,7 @@ func NewSimulation(sp *Space) *Simulation {
 }
 
 func (s *Simulation) print() {
-	log.Printf("%d:\n", s.round)
-	log.Println(s.space.ToString())
+	log.Printf("%d:\n%s", s.round, s.space.String())
 }
 
 func (s *Simulation) Play() {

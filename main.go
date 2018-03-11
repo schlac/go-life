@@ -8,9 +8,16 @@ import (
 )
 
 var (
+	// version string to be injected on build
 	version string = "private"
 )
 
+// main entry point
+// |-- print hello
+// |-- {OR}
+// |   |-- generate random simulation space
+// |   |-- read simulation space from file
+// |-- run simulation
 func main() {
 	ui.PrintHello(version)
 	if len(os.Args) < 2 {
