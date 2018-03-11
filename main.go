@@ -26,6 +26,8 @@ func main() {
 
 	filePath := os.Args[1]
 	sp := sim.NewSpaceFromFile(filePath)
+	log.Println(sp.StatsString())
+
 	si := sim.NewSimulation(sp)
 	si.Play()
 }
