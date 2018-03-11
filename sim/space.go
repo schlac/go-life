@@ -1,6 +1,7 @@
 package sim
 
 import (
+	"fmt"
 	"log"
 	"strings"
 	"io/ioutil"
@@ -22,8 +23,8 @@ type Space struct {
 // Create a new simulation space
 func NewSpace() *Space {
 	sp := new(Space)
-	sp.width = 80
-	sp.height = 80
+	sp.width = 10
+	sp.height = 10
 	return sp
 }
 
@@ -38,18 +39,39 @@ func NewSpaceFromFile(path string) *Space {
 	sp := NewSpace()
 	sp.data = data
 
-	// post process read data
+	// infer space width
 	for i := 0; i < len(sp.data); i++ {
 		c := sp.data[i]
-		if c == 0 || c == ' ' {
+		if c == '\r' || c == '\n' {
+			sp.width = i + 1
+			c = sp.data[i+1]
+			if c == '\r' || c == '\n' {
+				sp.width++
+			}
+			break
+		}
+	}
+
+	// post process read data
+	for i := 0; i < len(sp.data); i++ {
+		switch sp.data[i] {
+		case 0:
+		case '\r':
+		case '\n':
+		case ' ':
 			sp.data[i] = 0
-		} else {
+		default:
 			sp.data[i] = 1
 		}
 	}
 	sp.height = (len(sp.data) / sp.width ) + 1
 
 	return sp
+}
+
+// A statistics string
+func (s *Space) StatsString() string {
+	return fmt.Sprintf("space size: %d x %d", s.width, s.height)
 }
 
 // Convert the simulation space to a string
