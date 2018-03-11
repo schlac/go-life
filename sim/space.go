@@ -2,7 +2,14 @@ package sim
 
 import (
 	"log"
-	"os"
+	"strings"
+	"io/ioutil"
+)
+
+var (
+	border byte = '#'
+	pop byte = 'O'
+	npop byte = ' '
 )
 
 // Simulation Space
@@ -23,17 +30,16 @@ func NewSpace() *Space {
 // Create a new simulation space from file
 func NewSpaceFromFile(path string) *Space {
 	log.Printf("Loading file '%s'", path)
-	sp := NewSpace()
-
-	f, err := os.Open(path)
+	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		panic(err)
+		log.Panicln(err)
 	}
-	defer f.Close()
 
-	n, err := f.Read(sp.data)
+	sp := NewSpace()
+	sp.data = data
+
 	// post process read data
-	for i := 0; i < n; i++ {
+	for i := 0; i < len(sp.data); i++ {
 		c := sp.data[i]
 		if c == 0 || c == ' ' {
 			sp.data[i] = 0
@@ -41,23 +47,42 @@ func NewSpaceFromFile(path string) *Space {
 			sp.data[i] = 1
 		}
 	}
-	sp.height = (n / sp.width ) + 1
+	sp.height = (len(sp.data) / sp.width ) + 1
 
 	return sp
 }
 
-func (s *Space) ToString() string {
-	ret := ""
+// Convert the simulation space to a string
+func (s *Space) String() string {
+	var b strings.Builder
+	// fmt.Fprintf(&b, "array: %v", s.data)
+	// b.WriteByte('\n')
+
+	for i := 0; i < s.width + 2; i++ {
+		b.WriteByte(border)
+	}
+	b.WriteByte('\n')
+
 	for i, val := range s.data {
 		if i % s.width == 0 {
-			ret += "\n"
+			b.WriteByte(border)
 		}
 		if val > 0 {
-			ret += "#"
+			b.WriteByte(pop)
 		} else {
-			ret += " "
+			b.WriteByte(npop)
+		}
+		if i % s.width == s.width - 1 {
+			b.WriteByte(border)
+			b.WriteByte('\n')
 		}
 	}
-	return ret
+
+	for i := 0; i < s.width + 2; i++ {
+		b.WriteByte(border)
+	}
+	b.WriteByte('\n')
+
+	return b.String()
 }
 
