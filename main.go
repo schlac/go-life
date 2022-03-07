@@ -29,5 +29,7 @@ func main() {
 	log.Println(sp.StatsString())
 
 	si := sim.NewSimulation(sp)
-	si.Play()
+	for i := 1; i <= 2; i++ {
+		si.Play()
+	}
 }

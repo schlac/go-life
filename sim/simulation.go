@@ -13,6 +13,7 @@ func NewSimulation(sp *Space) *Simulation {
 	s := new(Simulation)
 	s.space = sp
 	s.round = 0
+	s.print()
 	return s
 }
 
@@ -21,7 +22,6 @@ func (s *Simulation) print() {
 }
 
 func (s *Simulation) Play() {
-	log.Printf("Starting round %d", s.round)
+	s.round++
 	s.print()
 }
-
