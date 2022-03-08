@@ -2,22 +2,28 @@ package sim
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
 	"strings"
-	"io/ioutil"
 )
 
-var (
-	border byte = '#'
-	pop byte = 'O'
-	npop byte = ' '
+const (
+	Border byte = '#'
+	Pop    byte = 'O'
+	Npop   byte = ' '
 )
 
 // Simulation Space
 type Space struct {
-	width int
+	width  int
 	height int
-	data []byte
+	data   []byte
+}
+
+func (s *Space) Clone() *Space {
+	data := make([]byte, len(s.data))
+        copy(data, s.data)
+	return &Space{s.width, s.height, data}
 }
 
 // Create a new simulation space
@@ -64,7 +70,7 @@ func NewSpaceFromFile(path string) *Space {
 			sp.data[i] = 1
 		}
 	}
-	sp.height = (len(sp.data) / sp.width ) + 1
+	sp.height = (len(sp.data) / sp.width) + 1
 
 	return sp
 }
@@ -80,31 +86,30 @@ func (s *Space) String() string {
 	// fmt.Fprintf(&b, "array: %v", s.data)
 	// b.WriteByte('\n')
 
-	for i := 0; i < s.width + 2; i++ {
-		b.WriteByte(border)
+	for i := 0; i < s.width+2; i++ {
+		b.WriteByte(Border)
 	}
 	b.WriteByte('\n')
 
 	for i, val := range s.data {
-		if i % s.width == 0 {
-			b.WriteByte(border)
+		if i%s.width == 0 {
+			b.WriteByte(Border)
 		}
 		if val > 0 {
-			b.WriteByte(pop)
+			b.WriteByte(Pop)
 		} else {
-			b.WriteByte(npop)
+			b.WriteByte(Npop)
 		}
-		if i % s.width == s.width - 1 {
-			b.WriteByte(border)
+		if i%s.width == s.width-1 {
+			b.WriteByte(Border)
 			b.WriteByte('\n')
 		}
 	}
 
-	for i := 0; i < s.width + 2; i++ {
-		b.WriteByte(border)
+	for i := 0; i < s.width+2; i++ {
+		b.WriteByte(Border)
 	}
 	b.WriteByte('\n')
 
 	return b.String()
 }
-

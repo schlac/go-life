@@ -23,5 +23,8 @@ func (s *Simulation) print() {
 
 func (s *Simulation) Play() {
 	s.round++
+	var next = s.space.Clone()
+        next.data[0] = Pop
+	s.space = next
 	s.print()
 }
