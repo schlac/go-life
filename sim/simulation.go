@@ -24,7 +24,18 @@ func (s *Simulation) print() {
 func (s *Simulation) Play() {
 	s.round++
 	var next = s.space.Clone()
-        next.data[0] = Pop
+	for y := 0; y < s.space.height; y++ {
+		for x := 0; x < s.space.width; x++ {
+			switch s.space.Neighbors(x, y) {
+			case 0, 1, 4, 5, 6, 7, 8:
+				next.Set(x, y, 0)
+			case 3:
+				next.Set(x, y, 1)
+			case 2:
+			default:
+			}
+		}
+	}
 	s.space = next
 	s.print()
 }

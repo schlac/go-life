@@ -1,10 +1,10 @@
 package main
 
 import (
+	"flag"
 	"github.com/schlac/go-life/sim"
 	"github.com/schlac/go-life/ui"
 	"log"
-	"os"
 )
 
 var (
@@ -20,16 +20,21 @@ var (
 // |-- run simulation
 func main() {
 	ui.PrintHello(version)
-	if len(os.Args) < 2 {
-		log.Panicln("Arg file missing")
+	roundsPtr := flag.Int("rounds", 2, "number of rounds to play")
+
+	flag.Parse()
+	args := flag.Args()
+
+	var sp *sim.Space
+	if len(args) >= 1 {
+		filePath := args[0]
+		sp = sim.NewSpaceFromFile(filePath)
+		log.Println(sp.StatsString())
+	} else {
+		sp = sim.NewRandomSpace()
 	}
-
-	filePath := os.Args[1]
-	sp := sim.NewSpaceFromFile(filePath)
-	log.Println(sp.StatsString())
-
 	si := sim.NewSimulation(sp)
-	for i := 1; i <= 2; i++ {
+	for i := 1; i <= *roundsPtr; i++ {
 		si.Play()
 	}
 }

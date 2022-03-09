@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"math/rand"
 	"strings"
 )
 
 const (
 	Border byte = '#'
-	Pop    byte = 'O'
-	Npop   byte = ' '
+	Pop    byte = 'X'
+	NPop   byte = ' '
 )
 
 // Simulation Space
@@ -22,15 +23,19 @@ type Space struct {
 
 func (s *Space) Clone() *Space {
 	data := make([]byte, len(s.data))
-        copy(data, s.data)
+	copy(data, s.data)
 	return &Space{s.width, s.height, data}
 }
 
 // Create a new simulation space
-func NewSpace() *Space {
+func NewRandomSpace() *Space {
 	sp := new(Space)
-	sp.width = 10
+	sp.width = 20
 	sp.height = 10
+	sp.data = make([]byte, sp.width*sp.height)
+	for i, v := range rand.Perm(sp.width * sp.height) {
+		sp.data[i] = byte(v % 2)
+	}
 	return sp
 }
 
@@ -42,7 +47,7 @@ func NewSpaceFromFile(path string) *Space {
 		log.Panicln(err)
 	}
 
-	sp := NewSpace()
+	sp := new(Space)
 	sp.data = data
 
 	// infer space width
@@ -61,23 +66,20 @@ func NewSpaceFromFile(path string) *Space {
 	// post process read data
 	for i := 0; i < len(sp.data); i++ {
 		switch sp.data[i] {
-		case 0:
-		case '\r':
-		case '\n':
-		case ' ':
+		case 0, '\r', '\n', ' ':
 			sp.data[i] = 0
 		default:
 			sp.data[i] = 1
 		}
 	}
-	sp.height = (len(sp.data) / sp.width) + 1
+	sp.height = (len(sp.data) / sp.width)
 
 	return sp
 }
 
 // A statistics string
 func (s *Space) StatsString() string {
-	return fmt.Sprintf("space size: %d x %d", s.width, s.height)
+	return fmt.Sprintf("space size: %d x %d (%d cells)", s.width, s.height, s.width*s.height)
 }
 
 // Convert the simulation space to a string
@@ -98,7 +100,7 @@ func (s *Space) String() string {
 		if val > 0 {
 			b.WriteByte(Pop)
 		} else {
-			b.WriteByte(Npop)
+			b.WriteByte(NPop)
 		}
 		if i%s.width == s.width-1 {
 			b.WriteByte(Border)
@@ -112,4 +114,16 @@ func (s *Space) String() string {
 	b.WriteByte('\n')
 
 	return b.String()
+}
+
+func (s *Space) Get(x int, y int) byte {
+	return s.data[x*y+x]
+}
+
+func (s *Space) Set(x int, y int, value byte) {
+	s.data[x*y+x] = value
+}
+
+func (s *Space) Neighbors(x int, y int) int {
+	return 0
 }
