@@ -37,5 +37,6 @@ func main() {
 	si := sim.NewSimulation(sp)
 	for i := 1; i <= *roundsPtr; i++ {
 		si.Play()
+		ui.PrintSimulation(si)
 	}
 }

@@ -5,18 +5,15 @@ import (
 	"io/ioutil"
 	"log"
 	"math/rand"
-	"strings"
-)
-
-const (
-	border byte = '#'
-	pop    byte = 'o'
-	npop   byte = ' '
 )
 
 // Simulation Space
 type Space struct {
 	cells [][]byte
+}
+
+func (s *Space) GetCells() [][]byte {
+	return s.cells
 }
 
 func (s *Space) Clone() Space {
@@ -94,35 +91,6 @@ func (s *Space) X() int {
 // A statistics string
 func (s *Space) StatsString() string {
 	return fmt.Sprintf("space size: %d x %d (%d cells)", s.X(), s.Y(), s.X()*s.Y())
-}
-
-// Convert the simulation space to a string
-func (s *Space) String() string {
-	var b strings.Builder
-
-	printHLine := func() {
-		for i := 0; i < s.X()+2; i++ {
-			b.WriteByte(border)
-		}
-		b.WriteByte('\n')
-	}
-
-	printHLine()
-	for _, row := range s.cells {
-		b.WriteByte(border)
-		for _, cell := range row {
-			if cell > 0 {
-				b.WriteByte(pop)
-			} else {
-				b.WriteByte(npop)
-			}
-		}
-		b.WriteByte(border)
-		b.WriteByte('\n')
-	}
-	printHLine()
-
-	return b.String()
 }
 
 func (s *Space) Get(x int, y int) byte {
