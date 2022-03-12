@@ -2,9 +2,10 @@ package main
 
 import (
 	"flag"
+	"log"
+
 	"github.com/schlac/go-life/sim"
 	"github.com/schlac/go-life/ui"
-	"log"
 )
 
 var (
@@ -20,12 +21,12 @@ var (
 // |-- run simulation
 func main() {
 	ui.PrintHello(version)
-	roundsPtr := flag.Int("rounds", 2, "number of rounds to play")
+	roundsPtr := flag.Int("rounds", 10, "number of rounds to play")
 
 	flag.Parse()
 	args := flag.Args()
 
-	var sp *sim.Space
+	var sp sim.Space
 	if len(args) >= 1 {
 		filePath := args[0]
 		sp = sim.NewSpaceFromFile(filePath)

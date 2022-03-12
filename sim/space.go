@@ -9,121 +9,157 @@ import (
 )
 
 const (
-	Border byte = '#'
-	Pop    byte = 'X'
-	NPop   byte = ' '
+	border byte = '#'
+	pop    byte = 'o'
+	npop   byte = ' '
 )
 
 // Simulation Space
 type Space struct {
-	width  int
-	height int
-	data   []byte
+	cells [][]byte
 }
 
-func (s *Space) Clone() *Space {
-	data := make([]byte, len(s.data))
-	copy(data, s.data)
-	return &Space{s.width, s.height, data}
+func (s *Space) Clone() Space {
+	var cells = make([][]byte, len(s.cells))
+	for i := range cells {
+		cells[i] = make([]byte, len(s.cells[0]))
+		copy(cells[i], s.cells[i])
+	}
+	return Space{cells}
 }
 
 // Create a new simulation space
-func NewRandomSpace() *Space {
-	sp := new(Space)
-	sp.width = 20
-	sp.height = 10
-	sp.data = make([]byte, sp.width*sp.height)
-	for i, v := range rand.Perm(sp.width * sp.height) {
-		sp.data[i] = byte(v % 2)
+func NewRandomSpace() Space {
+	width := 20
+	height := 10
+	var sp = Space{make([][]byte, height)}
+	for i := range sp.cells {
+		sp.cells[i] = make([]byte, width)
+		for j, r := range rand.Perm(width) {
+			sp.cells[i][j] = byte(r % 2)
+		}
 	}
 	return sp
 }
 
 // Create a new simulation space from file
-func NewSpaceFromFile(path string) *Space {
+func NewSpaceFromFile(path string) Space {
 	log.Printf("Loading file '%s'", path)
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		log.Panicln(err)
 	}
 
-	sp := new(Space)
-	sp.data = data
-
-	// infer space width
-	for i := 0; i < len(sp.data); i++ {
-		c := sp.data[i]
-		if c == '\r' || c == '\n' {
-			sp.width = i + 1
-			c = sp.data[i+1]
-			if c == '\r' || c == '\n' {
-				sp.width++
+	type row struct {
+		start  int
+		length int
+	}
+	var rows []row = make([]row, 0, 100)
+	var rowStart int = 0
+	var maxLength = 0
+	for i, c := range data {
+		if c == '\n' || c == '\r' {
+			var length = i - rowStart
+			if length > 0 {
+				rows = append(rows, row{rowStart, length})
 			}
-			break
+			rowStart = i + 1
+			if maxLength < length {
+				maxLength = length
+			}
 		}
 	}
 
-	// post process read data
-	for i := 0; i < len(sp.data); i++ {
-		switch sp.data[i] {
-		case 0, '\r', '\n', ' ':
-			sp.data[i] = 0
-		default:
-			sp.data[i] = 1
+	// read data into slices
+	var sp = Space{make([][]byte, len(rows))}
+	for i, row := range rows {
+		sp.cells[i] = make([]byte, maxLength)
+		copy(sp.cells[i], data[row.start:row.start+row.length])
+		for j, c := range sp.cells[i] {
+			sp.cells[i][j] = c % 2
 		}
 	}
-	sp.height = (len(sp.data) / sp.width)
 
 	return sp
 }
 
+func (s *Space) Y() int {
+	return len(s.cells)
+}
+
+func (s *Space) X() int {
+	return len(s.cells[0])
+}
+
 // A statistics string
 func (s *Space) StatsString() string {
-	return fmt.Sprintf("space size: %d x %d (%d cells)", s.width, s.height, s.width*s.height)
+	return fmt.Sprintf("space size: %d x %d (%d cells)", s.X(), s.Y(), s.X()*s.Y())
 }
 
 // Convert the simulation space to a string
 func (s *Space) String() string {
 	var b strings.Builder
-	// fmt.Fprintf(&b, "array: %v", s.data)
-	// b.WriteByte('\n')
 
-	for i := 0; i < s.width+2; i++ {
-		b.WriteByte(Border)
-	}
-	b.WriteByte('\n')
-
-	for i, val := range s.data {
-		if i%s.width == 0 {
-			b.WriteByte(Border)
+	printHLine := func() {
+		for i := 0; i < s.X()+2; i++ {
+			b.WriteByte(border)
 		}
-		if val > 0 {
-			b.WriteByte(Pop)
-		} else {
-			b.WriteByte(NPop)
-		}
-		if i%s.width == s.width-1 {
-			b.WriteByte(Border)
-			b.WriteByte('\n')
-		}
+		b.WriteByte('\n')
 	}
 
-	for i := 0; i < s.width+2; i++ {
-		b.WriteByte(Border)
+	printHLine()
+	for _, row := range s.cells {
+		b.WriteByte(border)
+		for _, cell := range row {
+			if cell > 0 {
+				b.WriteByte(pop)
+			} else {
+				b.WriteByte(npop)
+			}
+		}
+		b.WriteByte(border)
+		b.WriteByte('\n')
 	}
-	b.WriteByte('\n')
+	printHLine()
 
 	return b.String()
 }
 
 func (s *Space) Get(x int, y int) byte {
-	return s.data[x*y+x]
+	return s.cells[y][x]
 }
 
 func (s *Space) Set(x int, y int, value byte) {
-	s.data[x*y+x] = value
+	s.cells[y][x] = value
 }
 
-func (s *Space) Neighbors(x int, y int) int {
-	return 0
+func (s *Space) Neighbors(x int, y int) byte {
+	var sum byte = 0
+	if y > 0 {
+		if x > 0 {
+			sum += s.cells[y-1][x-1]
+		}
+		sum += s.cells[y-1][x]
+		if x < s.X()-1 {
+			sum += s.cells[y-1][x+1]
+		}
+	}
+
+	if x > 0 {
+		sum += s.cells[y][x-1]
+	}
+	if x < s.X()-1 {
+		sum += s.cells[y][x+1]
+	}
+
+	if y < s.Y()-1 {
+		if x > 0 {
+			sum += s.cells[y+1][x-1]
+		}
+		sum += s.cells[y+1][x]
+		if x < s.X()-1 {
+			sum += s.cells[y+1][x+1]
+		}
+	}
+	return sum
 }
