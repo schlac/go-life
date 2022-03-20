@@ -30,7 +30,11 @@ func main() {
 	var world sim.World
 	if len(args) >= 1 {
 		filePath := args[0]
-		world = bs.NewSpaceFromFile(filePath)
+		var err error
+		world, err = bs.NewSpaceFromFile(filePath)
+		if err != nil {
+			panic(err)
+		}
 	} else {
 		world = bs.NewRandomSpace(20, 10)
 	}

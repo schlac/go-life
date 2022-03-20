@@ -8,11 +8,11 @@ import (
 )
 
 // Create a new simulation space from file
-func NewSpaceFromFile(path string) sim.World {
+func NewSpaceFromFile(path string) (sim.World, error) {
 	log.Printf("Loading file '%s'", path)
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
-		log.Panicln(err)
+		return nil, err
 	}
 
 	type row struct {
@@ -36,7 +36,7 @@ func NewSpaceFromFile(path string) sim.World {
 	}
 
 	// read data into slices
-	var w = new(len(rows), maxLength)
+	var w = new(maxLength, len(rows))
 	for i, row := range rows {
 		copy((*w.cells)[i], data[row.start:row.start+row.length])
 		for j, c := range (*w.cells)[i] {
@@ -44,5 +44,5 @@ func NewSpaceFromFile(path string) sim.World {
 		}
 	}
 
-	return w
+	return w, nil
 }
