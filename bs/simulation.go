@@ -2,13 +2,16 @@ package bs
 
 import "github.com/schlac/go-life/sim"
 
+type stepper func(*bs)
+
 type bs struct {
-	round int
-	world *sim.World
+	round    int
+	world    *sim.World
+	stepFunc stepper
 }
 
 func NewSimulation(w *sim.World) sim.Simulation {
-	return &bs{0, w}
+	return &bs{0, w, Play}
 }
 
 func (s *bs) Round() int {
@@ -20,6 +23,10 @@ func (s *bs) World() sim.World {
 }
 
 func (s *bs) Play() {
+	s.stepFunc(s)
+}
+
+func Play(s *bs) {
 	s.round++
 	var current = *s.world
 	var next = current.Clone()
