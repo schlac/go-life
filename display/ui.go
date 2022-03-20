@@ -1,4 +1,4 @@
-package ui
+package display
 
 import (
 	"fmt"
@@ -18,16 +18,16 @@ func PrintHello(version string) {
 }
 
 func PrintSimulation(s sim.Simulation) {
-	fmt.Printf("\n%d:\n", s.Round)
-	PrintSpace(s.Space)
+	fmt.Printf("\n%d:\n", s.Round())
+	PrintSpace(s.World())
 }
 
-func PrintSpace(s sim.Space) {
-	fmt.Printf(String(s))
+func PrintSpace(s sim.World) {
+	fmt.Print(String(s))
 }
 
 // Convert the simulation space to a string
-func String(s sim.Space) string {
+func String(s sim.World) string {
 	var b strings.Builder
 
 	printHLine := func() {
@@ -38,7 +38,7 @@ func String(s sim.Space) string {
 	}
 
 	printHLine()
-	for _, row := range s.GetCells() {
+	for _, row := range *s.Cells() {
 		b.WriteByte(border)
 		for _, cell := range row {
 			if cell > 0 {

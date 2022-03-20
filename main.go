@@ -4,8 +4,9 @@ import (
 	"flag"
 	"log"
 
+	"github.com/schlac/go-life/bs"
+	"github.com/schlac/go-life/display"
 	"github.com/schlac/go-life/sim"
-	"github.com/schlac/go-life/ui"
 )
 
 var (
@@ -20,23 +21,23 @@ var (
 // |   |-- read simulation space from file
 // |-- run simulation
 func main() {
-	ui.PrintHello(version)
+	display.PrintHello(version)
 	roundsPtr := flag.Int("rounds", 10, "number of rounds to play")
 
 	flag.Parse()
 	args := flag.Args()
 
-	var sp sim.Space
+	var world sim.World
 	if len(args) >= 1 {
 		filePath := args[0]
-		sp = sim.NewSpaceFromFile(filePath)
-		log.Println(sp.StatsString())
+		world = bs.NewSpaceFromFile(filePath)
 	} else {
-		sp = sim.NewRandomSpace()
+		world = bs.NewRandomSpace(20, 10)
 	}
-	si := sim.NewSimulation(sp)
+	log.Println(world.Stats())
+	s := bs.NewSimulation(&world)
 	for i := 1; i <= *roundsPtr; i++ {
-		si.Play()
-		ui.PrintSimulation(si)
+		s.Play()
+		display.PrintSimulation(s)
 	}
 }
