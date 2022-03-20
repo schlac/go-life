@@ -47,7 +47,7 @@ func main() {
 		world = bs.NewRandomSpace(20, 10, seed)
 	}
 	log.Println(world.Stats())
-	s := bs.NewSimulation(&world)
+	s := bs.NewCloneSimulation(&world)
 	for i := 1; i <= *roundsPtr; i++ {
 		s.Play()
 		display.PrintSimulation(s)
