@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"log"
+	"time"
 
 	"github.com/schlac/go-life/bs"
 	"github.com/schlac/go-life/display"
@@ -23,6 +24,7 @@ var (
 func main() {
 	display.PrintHello(version)
 	roundsPtr := flag.Int("rounds", 10, "number of rounds to play")
+	seedPtr := flag.Int64("seed", 0, "seed to use for random numbers")
 
 	flag.Parse()
 	args := flag.Args()
@@ -36,7 +38,13 @@ func main() {
 			panic(err)
 		}
 	} else {
-		world = bs.NewRandomSpace(20, 10)
+		var seed int64
+		if *seedPtr != 0 {
+			seed = *seedPtr
+		} else {
+			seed = time.Now().UnixNano()
+		}
+		world = bs.NewRandomSpace(20, 10, seed)
 	}
 	log.Println(world.Stats())
 	s := bs.NewSimulation(&world)
