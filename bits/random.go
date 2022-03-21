@@ -1,4 +1,4 @@
-package bs
+package bits
 
 import (
 	"math/rand"
@@ -11,11 +11,14 @@ func NewRandomSpace(width int, height int, seed int64) sim.World {
 	if seed != 0 {
 		rand.Seed(seed)
 	}
-	var w = new(width, height)
-	for i := range *w.cells {
-		for j, r := range rand.Perm(width) { // TODO use rand.Read()
-			(*w.cells)[i][j] = byte(r % 2)
-		}
+
+	var b = make([][]byte, height)
+	for i := range b {
+		var row = make([]byte, (width/blockSize)+1)
+		rand.Read(row)
+		//log.Printf("%08b", row)
+		b[i] = row
 	}
+	var w sim.World = &world{&b, width}
 	return w
 }

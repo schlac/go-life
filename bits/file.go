@@ -1,4 +1,4 @@
-package bs
+package bits
 
 import (
 	"io/ioutil"
@@ -37,10 +37,9 @@ func NewSpaceFromFile(path string) (sim.World, error) {
 
 	// read data into slices
 	var w = new(maxLength, len(rows))
-	for i, row := range rows {
-		copy((*w.cells)[i], data[row.start:row.start+row.length])
-		for j, c := range (*w.cells)[i] {
-			(*w.cells)[i][j] = c % 2
+	for y, row := range rows {
+		for x, c := range data[row.start : row.start+row.length] {
+			w.Set(x, y, c%2)
 		}
 	}
 

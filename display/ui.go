@@ -41,10 +41,10 @@ func String(s sim.World) string {
 	for _, row := range *s.Cells() {
 		b.WriteByte(border)
 		for _, cell := range row {
-			if cell > 0 {
-				b.WriteByte(pop)
-			} else {
+			if cell == 0 {
 				b.WriteByte(npop)
+			} else {
+				b.WriteByte(pop)
 			}
 		}
 		b.WriteByte(border)

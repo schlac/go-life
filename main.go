@@ -4,8 +4,9 @@ import (
 	"flag"
 	"log"
 	"time"
+	"io/ioutil"
 
-	"github.com/schlac/go-life/bs"
+	bs "github.com/schlac/go-life/bits"
 	"github.com/schlac/go-life/display"
 	"github.com/schlac/go-life/sim"
 )
@@ -25,9 +26,14 @@ func main() {
 	display.PrintHello(version)
 	roundsPtr := flag.Int("rounds", 10, "number of rounds to play")
 	seedPtr := flag.Int64("seed", 0, "seed to use for random numbers")
+	verbosePtr := flag.Bool("verbose", false, "logging")
 
 	flag.Parse()
 	args := flag.Args()
+
+	if !*verbosePtr {
+		log.SetOutput(ioutil.Discard)
+	}
 
 	var world sim.World
 	if len(args) >= 1 {
@@ -48,6 +54,7 @@ func main() {
 	}
 	log.Println(world.Stats())
 	s := bs.NewCloneSimulation(&world)
+	display.PrintSimulation(s)
 	for i := 1; i <= *roundsPtr; i++ {
 		s.Play()
 		display.PrintSimulation(s)

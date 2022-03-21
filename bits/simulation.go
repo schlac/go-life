@@ -1,4 +1,4 @@
-package bs
+package bits
 
 import "github.com/schlac/go-life/sim"
 
